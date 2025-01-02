@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+.claude
+
+# Environment variables
+.env
+.env.local
+
+CLAUDE.md
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+
+# Coverage
+coverage/

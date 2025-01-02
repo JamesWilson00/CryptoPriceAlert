@@ -1,0 +1,28 @@
+{
+  "name": "crypto-price-alert",
+  "version": "0.1.0",
+  "description": "A cryptocurrency price monitoring and alert system",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "bitcoin",
+    "ethereum",
+    "price",
+    "alert",
+    "notification"
+  ],
+  "author": "JamesWilson00",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
