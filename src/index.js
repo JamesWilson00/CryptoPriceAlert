@@ -1,6 +1,9 @@
 const axios = require('axios');
+const AlertManager = require('./alertManager');
 
 console.log('Crypto Price Alert System Starting...');
+
+const alertManager = new AlertManager();
 
 async function getCryptoPrice(symbol) {
     try {
@@ -12,15 +15,33 @@ async function getCryptoPrice(symbol) {
     }
 }
 
-async function main() {
-    console.log('Fetching Bitcoin price...');
-    const btcPrice = await getCryptoPrice('bitcoin');
+async function checkPrices() {
+    console.log('Checking crypto prices...');
     
+    // Bitcoin
+    const btcPrice = await getCryptoPrice('bitcoin');
     if (btcPrice) {
         console.log(`Current BTC price: $${btcPrice}`);
-    } else {
-        console.log('Failed to fetch BTC price');
+        alertManager.checkAlerts('bitcoin', btcPrice);
     }
+    
+    // Ethereum  
+    const ethPrice = await getCryptoPrice('ethereum');
+    if (ethPrice) {
+        console.log(`Current ETH price: $${ethPrice}`);
+        alertManager.checkAlerts('ethereum', ethPrice);
+    }
+}
+
+async function main() {
+    // Add some sample alerts
+    alertManager.addAlert('bitcoin', 45000, 'above');
+    alertManager.addAlert('bitcoin', 35000, 'below');
+    alertManager.addAlert('ethereum', 3000, 'above');
+    
+    console.log(`Active alerts: ${alertManager.getActiveAlerts().length}`);
+    
+    await checkPrices();
 }
 
 main();
