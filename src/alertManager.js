@@ -1,8 +1,10 @@
 const PriceAlert = require('./alert');
+const NotificationService = require('./notification');
 
 class AlertManager {
     constructor() {
         this.alerts = [];
+        this.notificationService = new NotificationService();
     }
     
     addAlert(crypto, threshold, type) {
@@ -22,15 +24,18 @@ class AlertManager {
         return false;
     }
     
-    checkAlerts(crypto, currentPrice) {
+    async checkAlerts(crypto, currentPrice) {
         const triggeredAlerts = [];
         
-        this.alerts.forEach(alert => {
+        for (const alert of this.alerts) {
             if (alert.crypto === crypto && alert.checkAlert(currentPrice)) {
                 triggeredAlerts.push(alert);
-                console.log(alert.getAlertMessage(currentPrice));
+                
+                // Send notifications
+                await this.notificationService.sendConsoleAlert(alert, currentPrice);
+                await this.notificationService.sendEmailAlert(alert, currentPrice);
             }
-        });
+        }
         
         return triggeredAlerts;
     }

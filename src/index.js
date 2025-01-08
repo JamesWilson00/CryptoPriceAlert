@@ -22,14 +22,14 @@ async function checkPrices() {
     const btcPrice = await getCryptoPrice('bitcoin');
     if (btcPrice) {
         console.log(`Current BTC price: $${btcPrice}`);
-        alertManager.checkAlerts('bitcoin', btcPrice);
+        await alertManager.checkAlerts('bitcoin', btcPrice);
     }
     
     // Ethereum  
     const ethPrice = await getCryptoPrice('ethereum');
     if (ethPrice) {
         console.log(`Current ETH price: $${ethPrice}`);
-        alertManager.checkAlerts('ethereum', ethPrice);
+        await alertManager.checkAlerts('ethereum', ethPrice);
     }
 }
 
