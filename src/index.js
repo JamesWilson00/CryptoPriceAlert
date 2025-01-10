@@ -1,5 +1,7 @@
 const axios = require('axios');
+const cron = require('node-cron');
 const AlertManager = require('./alertManager');
+require('dotenv').config();
 
 console.log('Crypto Price Alert System Starting...');
 
@@ -33,7 +35,9 @@ async function checkPrices() {
     }
 }
 
-async function main() {
+function startMonitoring() {
+    console.log('Starting scheduled monitoring...');
+    
     // Add some sample alerts
     alertManager.addAlert('bitcoin', 45000, 'above');
     alertManager.addAlert('bitcoin', 35000, 'below');
@@ -41,7 +45,21 @@ async function main() {
     
     console.log(`Active alerts: ${alertManager.getActiveAlerts().length}`);
     
-    await checkPrices();
+    // Run immediately
+    checkPrices();
+    
+    // Schedule price checks every 5 minutes
+    cron.schedule('*/5 * * * *', () => {
+        console.log('\n--- Scheduled price check ---');
+        checkPrices();
+    });
+    
+    // Schedule daily summary at 9 AM
+    cron.schedule('0 9 * * *', () => {
+        console.log('\n--- Daily Alert Summary ---');
+        console.log(`Total alerts: ${alertManager.getAllAlerts().length}`);
+        console.log(`Active alerts: ${alertManager.getActiveAlerts().length}`);
+    });
 }
 
-main();
+startMonitoring();
