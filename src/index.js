@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cron = require('node-cron');
 const AlertManager = require('./alertManager');
+const { getAllSupportedCryptos, formatCryptoName } = require('./cryptoList');
 require('dotenv').config();
 
 console.log('Crypto Price Alert System Starting...');
@@ -20,30 +21,43 @@ async function getCryptoPrice(symbol) {
 async function checkPrices() {
     console.log('Checking crypto prices...');
     
-    // Bitcoin
-    const btcPrice = await getCryptoPrice('bitcoin');
-    if (btcPrice) {
-        console.log(`Current BTC price: $${btcPrice}`);
-        await alertManager.checkAlerts('bitcoin', btcPrice);
-    }
+    const supportedCryptos = ['bitcoin', 'ethereum', 'cardano', 'solana', 'dogecoin'];
     
-    // Ethereum  
-    const ethPrice = await getCryptoPrice('ethereum');
-    if (ethPrice) {
-        console.log(`Current ETH price: $${ethPrice}`);
-        await alertManager.checkAlerts('ethereum', ethPrice);
+    for (const crypto of supportedCryptos) {
+        const price = await getCryptoPrice(crypto);
+        if (price) {
+            console.log(`${formatCryptoName(crypto)}: $${price}`);
+            await alertManager.checkAlerts(crypto, price);
+            
+            // Save price to history if storage is available
+            if (alertManager.storage) {
+                await alertManager.storage.savePriceHistory(crypto, price);
+            }
+        }
+        
+        // Small delay between API calls to be respectful
+        await new Promise(resolve => setTimeout(resolve, 200));
     }
 }
 
 function startMonitoring() {
     console.log('Starting scheduled monitoring...');
     
-    // Add some sample alerts
+    // Add some sample alerts for different cryptos
     alertManager.addAlert('bitcoin', 45000, 'above');
     alertManager.addAlert('bitcoin', 35000, 'below');
     alertManager.addAlert('ethereum', 3000, 'above');
+    alertManager.addAlert('cardano', 0.50, 'above');
+    alertManager.addAlert('solana', 100, 'below');
+    alertManager.addAlert('dogecoin', 0.10, 'above');
     
     console.log(`Active alerts: ${alertManager.getActiveAlerts().length}`);
+    
+    // Show supported cryptocurrencies
+    console.log('\nSupported cryptocurrencies:');
+    getAllSupportedCryptos().forEach(crypto => {
+        console.log(`- ${crypto.emoji} ${crypto.name} (${crypto.symbol})`);
+    });
     
     // Run immediately
     checkPrices();

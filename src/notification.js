@@ -1,9 +1,11 @@
 const nodemailer = require('nodemailer');
+const WebhookNotification = require('./webhook');
 require('dotenv').config();
 
 class NotificationService {
     constructor() {
         this.transporter = null;
+        this.webhookService = new WebhookNotification();
         this.setupEmailTransporter();
     }
     
@@ -66,6 +68,18 @@ class NotificationService {
         console.log(`Triggered at: ${new Date().toLocaleString()}`);
         console.log('='.repeat(50));
         return true;
+    }
+    
+    async sendAllNotifications(alert, currentPrice) {
+        const results = await Promise.allSettled([
+            this.sendConsoleAlert(alert, currentPrice),
+            this.sendEmailAlert(alert, currentPrice),
+            this.webhookService.sendAllWebhooks(alert, currentPrice)
+        ]);
+        
+        return results.some(result => 
+            result.status === 'fulfilled' && result.value === true
+        );
     }
 }
 
