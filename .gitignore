@@ -23,4 +23,8 @@ coverage/
 
 # Data files
 data/
-*.json
+config.json
+
+# Logs
+logs/
+*.log
